@@ -2,6 +2,10 @@
 // import 'package:firebase_registera_and_login/homepage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_signin_button/flutter_signin_button.dart';
+
+import 'homePage.dart';
+import 'homePage.dart';
+import 'homePage.dart';
 // import 'package:firebase_auth/firebase_auth.dart';
 
 class LoginPage extends StatefulWidget {
@@ -51,7 +55,7 @@ class _LoginPageState extends State<LoginPage> {
                 padding: const EdgeInsets.only(top: 45),
                 child: Center(
                   child: Image(
-                    image: AssetImage("assets/logo.png"),
+                    image: AssetImage("asset/logo.png"),
                     height: 100,
                     width: 100,
                   ),
@@ -123,7 +127,12 @@ class _LoginPageState extends State<LoginPage> {
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white),
                           ),
-                          onPressed: null,
+                          onPressed: () {
+                            Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => homePage()));
+                          },
                           style: ButtonStyle(
                               backgroundColor:
                                   MaterialStateProperty.all(Color(0xffee0b0b)),
@@ -181,30 +190,30 @@ class _LoginPageState extends State<LoginPage> {
                     ElevatedButton(
                       style: ButtonStyle(
                         shape: MaterialStateProperty.all(CircleBorder()),
-                        backgroundColor: MaterialStateProperty.all(Colors.white),
+                        backgroundColor:
+                            MaterialStateProperty.all(Colors.white),
                       ),
                       onPressed: null,
                       child: Image(
                         height: 45,
                         width: 45,
-                        image: AssetImage("assets/fblogo.png"),
+                        image: AssetImage("asset/fblogo.png"),
                       ),
                     ),
-
                     ElevatedButton(
                       style: ButtonStyle(
                         shape: MaterialStateProperty.all(CircleBorder()),
                         padding: MaterialStateProperty.all(EdgeInsets.all(5)),
-                        backgroundColor: MaterialStateProperty.all(Colors.white),
+                        backgroundColor:
+                            MaterialStateProperty.all(Colors.white),
                       ),
                       onPressed: null,
                       child: Image(
                         height: 35,
                         width: 35,
-                        image: AssetImage("assets/google.png"),
+                        image: AssetImage("asset/google.png"),
                       ),
                     ),
-
                   ],
                 ),
               )

@@ -18,7 +18,7 @@ class _SplashState extends State<Splash> {
   Widget build(BuildContext context) {
     return SplashScreen(
         image: Image(
-          image: AssetImage("assets/logo.png"),
+          image: AssetImage("asset/logo.png"),
         ),
         navigateAfterSeconds: LoginPage(),
         seconds: 3,
