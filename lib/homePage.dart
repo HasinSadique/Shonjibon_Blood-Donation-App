@@ -2,6 +2,7 @@ import 'package:circular_profile_avatar/circular_profile_avatar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:shonjibon/CreatePost.dart';
 
 class homePage extends StatefulWidget {
   const homePage({Key key}) : super(key: key);
@@ -83,14 +84,20 @@ class _homePageState extends State<homePage> {
               ),
             ),
             ListTile(
-              leading:Icon(Icons.settings,color: Colors.black,),
+              leading: Icon(
+                Icons.settings,
+                color: Colors.black,
+              ),
               title: Text(
                 "Settings",
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
             ),
             ListTile(
-              leading: Icon(Icons.logout,color: Colors.black,),
+              leading: Icon(
+                Icons.logout,
+                color: Colors.black,
+              ),
               title: Text(
                 "Logout",
                 style: TextStyle(fontWeight: FontWeight.bold),
@@ -153,13 +160,25 @@ class _homePageState extends State<homePage> {
               children: [
                 Column(
                   children: [
-                    SizedBox(height: 10,),
+                    SizedBox(
+                      height: 10,
+                    ),
                     ElevatedButton(
-                      style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Color(0xffee0b0b))),
+                        style: ButtonStyle(
+                            backgroundColor:
+                                MaterialStateProperty.all(Color(0xffee0b0b))),
                         onPressed: () {
-                          setState(() {message(context);});
+                          setState(() {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => CreatePost()));
+                          });
                         },
-                        child: Text("Post Blood Request",style: TextStyle(fontWeight: FontWeight.bold),))
+                        child: Text(
+                          "Post Blood Request",
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ))
                   ],
                 ),
                 Column(

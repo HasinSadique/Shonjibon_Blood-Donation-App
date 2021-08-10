@@ -1,7 +1,6 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:shonjibon/iPhone12ProMax1.dart';
 import 'package:splashscreen/splashscreen.dart';
 
 import 'LoginPage.dart';
