@@ -2,6 +2,8 @@
 // import 'package:firebase_registera_and_login/homepage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_signin_button/flutter_signin_button.dart';
+import 'package:shonjibon/SignUp.dart';
+import 'package:shonjibon/SignupPage.dart';
 
 import 'homePage.dart';
 import 'homePage.dart';
@@ -17,7 +19,7 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   GlobalKey<FormState> formkey = GlobalKey<FormState>();
-  String _email, _password;
+  var _email, _password;
 
   // Future<void> login() async {
   //   final formstate = formkey.currentState;
@@ -34,13 +36,20 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    var _height = MediaQuery.of(context).size.height;
+    var _width = MediaQueryData().textScaleFactor;
+    print("Height:");
+    print(_height);
+    print("Width:");
+    print(_width);
+
     return Scaffold(
       backgroundColor: Color(0xffbf0707),
       body: Stack(
         children: [
           //For Logo White Background
           Container(
-              width: MediaQuery.of(context).size.width,
+              // width: MediaQuery.of(context).size.width,
               height: 150,
               decoration: BoxDecoration(
                   borderRadius: BorderRadius.only(
@@ -95,6 +104,9 @@ class _LoginPageState extends State<LoginPage> {
                             const EdgeInsets.only(left: 15, right: 15, top: 20),
                         child: TextFormField(
                           decoration: InputDecoration(hintText: "Email"),
+                          onChanged: (value){
+                            _email=value;
+                          },
                         ),
                       ),
                       //Password Edit Text
@@ -103,6 +115,9 @@ class _LoginPageState extends State<LoginPage> {
                             const EdgeInsets.only(left: 15, right: 15, top: 20),
                         child: TextFormField(
                           decoration: InputDecoration(hintText: "Password"),
+                          onChanged: (value){
+                            _password=value;
+                          },
                         ),
                       ),
 
@@ -146,7 +161,12 @@ class _LoginPageState extends State<LoginPage> {
                       Padding(
                         padding: const EdgeInsets.only(bottom: 30, top: 5),
                         child: ElevatedButton(
-                            onPressed: null,
+                            onPressed: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => SignUp()));
+                            },
                             style: ButtonStyle(
                                 backgroundColor: MaterialStateProperty.all(
                                     Color(0xffee0b0b)),
