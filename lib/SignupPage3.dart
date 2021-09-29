@@ -1,9 +1,12 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shonjibon/LoginPage.dart';
 import 'SignupPage2.dart';
 import 'package:step_progress_indicator/step_progress_indicator.dart';
-
+import 'package:http/http.dart' as http;
 import 'User.dart';
 
 class SignupPage3 extends StatefulWidget {
@@ -25,18 +28,11 @@ class _SignupPage3State extends State<SignupPage3> {
       _Gender,
       _Smoker,
       _Vaccinated;
+  bool _checkedTerms = false;
 
   @override
   Widget build(BuildContext context) {
     User CurrentUser = widget.user;
-
-    // print(CurrentUser.Fullname + "'s Age is " + CurrentUser.Age);
-    // print("And Last Donated " +
-    //     CurrentUser.LastBloodDonationDate +
-    //     ".\nAlso " +
-    //     CurrentUser.Vaccinated +
-    //     " is the Vaccination status.");
-
     var _StepCounter = 3;
 
     return Scaffold(
@@ -377,10 +373,69 @@ class _SignupPage3State extends State<SignupPage3> {
                               ],
                             ),
                             SizedBox(height: 20),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        "Blood donor: ",
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 15),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        CurrentUser.WantsToDonated,
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: 10),
                           ],
                         ),
                       ),
                     ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 15, right: 15, bottom: 25),
+                child: Row(
+                  children: [
+                    Column(
+                      children: [
+                        Checkbox(
+                            value: _checkedTerms,
+                            onChanged: (value) {
+                              setState(() {
+                                _checkedTerms = value;
+                              });
+                            }),
+                      ],
+                    ),
+                    SizedBox(
+                      width: 10,
+                    ),
+                    Expanded(
+                        child: Column(
+                      children: [
+                        Text(
+                            "Before you can submit your registration, you must accept Shonjibon\'s Terms of Services.")
+                      ],
+                    ))
                   ],
                 ),
               ),
@@ -420,11 +475,24 @@ class _SignupPage3State extends State<SignupPage3> {
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () {
-                        //Go to Login Page
-                        Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => LoginPage()));
+                        setState(() {
+                          if (_checkedTerms == true) {
+                            //upload signup data to db
+                            uploadSignupData(CurrentUser);
+                          } else {
+                            final snackBar = SnackBar(
+                              content: Text(
+                                "Accept the terms before submitting.",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 17),
+                              ),
+                              duration: Duration(seconds: 5),
+                            );
+                            ScaffoldMessenger.of(context)
+                                .showSnackBar(snackBar);
+                          }
+                        });
                       },
                       child: Text(
                         "SUBMIT",
@@ -448,5 +516,50 @@ class _SignupPage3State extends State<SignupPage3> {
         ),
       ),
     );
+  }
+
+  uploadSignupData(User currentUser) async {
+    var url = "http://localhost:3000/signup";
+    final response = await http.post(
+      Uri.parse(url),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, String>{
+        'email': currentUser.Email,
+        'password': currentUser.Password,
+      }),
+    );
+
+    var parse = jsonDecode(response.body);
+    if (parse["error"] == 403) {
+      // print("Email already exists.");
+      final snackBar = SnackBar(
+          duration: Duration(seconds: 3),
+          content: Row(
+            children: [
+              Expanded(child: Text("Email already exists.")),
+              InkWell(
+                onTap: () {
+                  setState(() {
+                    Navigator.pushReplacement(context,
+                        MaterialPageRoute(builder: (context) => LoginPage()));
+                  });
+                },
+                child: Text(
+                  "Login",
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                      color: Colors.yellow),
+                ),
+              )
+            ],
+          ));
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    } else if (parse["token"] != null) {
+      Navigator.pushReplacement(
+          context, MaterialPageRoute(builder: (context) => LoginPage()));
+    }
   }
 }

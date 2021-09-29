@@ -2,7 +2,9 @@ import 'package:circular_profile_avatar/circular_profile_avatar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shonjibon/CreatePost.dart';
+import 'package:shonjibon/LoginPage.dart';
 
 class homePage extends StatefulWidget {
   const homePage({Key key}) : super(key: key);
@@ -85,6 +87,19 @@ class _homePageState extends State<homePage> {
             ),
             ListTile(
               leading: Icon(
+                Icons.article,
+                color: Colors.black,
+              ),
+              // leading: Image(
+              //   image: AssetImage("asset/posts.png"),
+              // ),
+              title: Text(
+                "My Posts",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
+            ListTile(
+              leading: Icon(
                 Icons.settings,
                 color: Colors.black,
               ),
@@ -94,12 +109,17 @@ class _homePageState extends State<homePage> {
               ),
             ),
             ListTile(
+              onTap: () {
+                LogOutUser();
+                Navigator.pushReplacement(context,
+                    MaterialPageRoute(builder: (context) => LoginPage()));
+              },
               leading: Icon(
                 Icons.logout,
                 color: Colors.black,
               ),
               title: Text(
-                "Logout",
+                "Log out",
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
             ),
@@ -108,8 +128,8 @@ class _homePageState extends State<homePage> {
       ),
       appBar: AppBar(
         backgroundColor: Color(0xffee0b0b),
-        title: Text("Shonjibon"),
-        centerTitle: true,
+        title: Text("Home"),
+        centerTitle: false,
         actions: [
           ElevatedButton(
             style: ButtonStyle(
@@ -196,5 +216,10 @@ class _homePageState extends State<homePage> {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: Text("Hello Ji, Pore Kotha Hobe. Bye"),
     ));
+  }
+
+  void LogOutUser() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.remove("token");
   }
 }

@@ -1,12 +1,12 @@
 // import 'package:firebase_registera_and_login/RegistrationPage.dart';
 // import 'package:firebase_registera_and_login/homepage.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_signin_button/flutter_signin_button.dart';
-import 'package:shonjibon/SignUp.dart';
-import 'package:shonjibon/SignupPage.dart';
+import 'dart:convert';
 
-import 'homePage.dart';
-import 'homePage.dart';
+import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shonjibon/SignUp.dart';
+import 'package:http/http.dart' as http;
+
 import 'homePage.dart';
 // import 'package:firebase_auth/firebase_auth.dart';
 
@@ -18,31 +18,22 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  GlobalKey<FormState> formkey = GlobalKey<FormState>();
-  var _email, _password;
+  GlobalKey<FormState> _formkey = GlobalKey<FormState>();
 
-  // Future<void> login() async {
-  //   final formstate = formkey.currentState;
-  //
-  //   if (formstate.validate()) {
-  //     formstate.save();
-  //     FirebaseUser loginUser = await FirebaseAuth.instance
-  //         .signInWithEmailAndPassword(email: _email, password: _password);
-  //     Navigator.pop(context);
-  //     Navigator.push(
-  //         context, MaterialPageRoute(builder: (context) => Homepage()));
-  //   }
-  // }
+  TextEditingController _emailController = TextEditingController();
+  TextEditingController _passwordController = TextEditingController();
+
+  redirectUI() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String token = prefs.getString("token");
+    if (token != null) {
+      Navigator.pushReplacement(
+          context, MaterialPageRoute(builder: (context) => homePage()));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    var _height = MediaQuery.of(context).size.height;
-    var _width = MediaQueryData().textScaleFactor;
-    print("Height:");
-    print(_height);
-    print("Width:");
-    print(_width);
-
     return Scaffold(
       backgroundColor: Color(0xffbf0707),
       body: Stack(
@@ -85,87 +76,84 @@ class _LoginPageState extends State<LoginPage> {
                     border: Border.all(width: 1, color: Colors.black),
                   ),
                   //The Sign in text
-                  child: Column(
-                    mainAxisSize: MainAxisSize.max,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(top: 15),
-                        child: Text(
-                          "SIGN IN",
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                      //Email Edit Text
-                      Padding(
-                        padding:
-                            const EdgeInsets.only(left: 15, right: 15, top: 20),
-                        child: TextFormField(
-                          decoration: InputDecoration(hintText: "Email"),
-                          onChanged: (value){
-                            _email=value;
-                          },
-                        ),
-                      ),
-                      //Password Edit Text
-                      Padding(
-                        padding:
-                            const EdgeInsets.only(left: 15, right: 15, top: 20),
-                        child: TextFormField(
-                          decoration: InputDecoration(hintText: "Password"),
-                          onChanged: (value){
-                            _password=value;
-                          },
-                        ),
-                      ),
-
-                      Padding(
-                        padding: const EdgeInsets.only(right: 15, top: 10),
-                        child: Row(
-                          children: [
-                            const Expanded(child: SizedBox()),
-                            Text(
-                              "Forgot Password?",
-                            ),
-                          ],
-                        ),
-                      ),
-                      //The login Button
-                      Padding(
-                        padding: const EdgeInsets.only(top: 20),
-                        child: ElevatedButton(
+                  child: Form(
+                    key: _formkey,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.max,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(top: 15),
                           child: Text(
-                            "Sign In",
+                            "SIGN IN",
                             style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white),
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
-                          onPressed: () {
-                            Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => homePage()));
-                          },
-                          style: ButtonStyle(
-                              backgroundColor:
-                                  MaterialStateProperty.all(Color(0xffee0b0b)),
-                              shape: MaterialStateProperty.all(
-                                RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(15),
-                                    side: BorderSide(color: Color(0xffbf0707))),
-                              )),
                         ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 30, top: 5),
-                        child: ElevatedButton(
+                        //Email Edit Text
+                        Padding(
+                          padding: const EdgeInsets.only(
+                              left: 15, right: 15, top: 20),
+                          child: TextFormField(
+                            controller: _emailController,
+                            keyboardType: TextInputType.text,
+                            decoration: InputDecoration(hintText: "Email"),
+                            onChanged: (value) {},
+                            validator: (value) {
+                              if (value.isEmpty) {
+                                return "Enter login email";
+                              }
+                              return null;
+                            },
+                          ),
+                        ),
+                        //Password Edit Text
+                        Padding(
+                          padding: const EdgeInsets.only(
+                              left: 15, right: 15, top: 20),
+                          child: TextFormField(
+                            controller: _passwordController,
+                            decoration: InputDecoration(hintText: "Password"),
+                            onChanged: (value) {},
+                            validator: (value) {
+                              if (value.isEmpty) {
+                                return "Enter password";
+                              }
+                              return null;
+                            },
+                          ),
+                        ),
+
+                        Padding(
+                          padding: const EdgeInsets.only(right: 15, top: 10),
+                          child: Row(
+                            children: [
+                              const Expanded(child: SizedBox()),
+                              Text(
+                                "Forgot Password?",
+                              ),
+                            ],
+                          ),
+                        ),
+                        //The login Button
+                        Padding(
+                          padding: const EdgeInsets.only(top: 20),
+                          child: ElevatedButton(
+                            child: Text(
+                              "Sign In",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white),
+                            ),
                             onPressed: () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => SignUp()));
+                              setState(() {
+                                if (_formkey.currentState.validate()) {
+                                  loginUsingEmailAndPassword(
+                                      _emailController.text,
+                                      _passwordController.text);
+                                }
+                              });
                             },
                             style: ButtonStyle(
                                 backgroundColor: MaterialStateProperty.all(
@@ -176,14 +164,35 @@ class _LoginPageState extends State<LoginPage> {
                                       side:
                                           BorderSide(color: Color(0xffbf0707))),
                                 )),
-                            child: Text(
-                              "Sign Up",
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white),
-                            )),
-                      )
-                    ],
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 30, top: 5),
+                          child: ElevatedButton(
+                              onPressed: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => SignUp()));
+                              },
+                              style: ButtonStyle(
+                                  backgroundColor: MaterialStateProperty.all(
+                                      Color(0xffee0b0b)),
+                                  shape: MaterialStateProperty.all(
+                                    RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(15),
+                                        side: BorderSide(
+                                            color: Color(0xffbf0707))),
+                                  )),
+                              child: Text(
+                                "Sign Up",
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white),
+                              )),
+                        )
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -237,112 +246,39 @@ class _LoginPageState extends State<LoginPage> {
                   ],
                 ),
               )
-              //Sign Up Layout/container
-              // Padding(
-              //   padding: const EdgeInsets.only( left: 20, right: 20),
-              //   child: Container(
-              //     height: 01,
-              //     width: MediaQuery.of(context).size.width,
-              //     decoration: BoxDecoration(
-              //         color: Colors.white,
-              //         borderRadius: BorderRadius.only(
-              //             bottomRight: Radius.circular(25),
-              //             bottomLeft: Radius.circular(25)),
-              //         border: Border.all(width: 1, color: Colors.black)),
-              //   ),
-              // )
             ],
           )
         ],
       ),
-
-      // appBar: AppBar(
-      //   title: Center(child: Text("Login Page")),
-      //   backgroundColor: Colors.red,
-      // ),
-      // body: Form(
-      //   key: formkey,
-      //   child: Column(
-      //     children: [
-      //       Padding(
-      //         padding: const EdgeInsets.all(15.0),
-      //         child: TextFormField(
-      //           decoration: InputDecoration(hintText: "Email"),
-      //           keyboardType: TextInputType.emailAddress,
-      //           onSaved: (input) {
-      //             _email = input;
-      //           },
-      //           validator: (input) {
-      //             if (input.isEmpty) {
-      //               return "Email cannot be empty.";
-      //             }
-      //             return null;
-      //           },
-      //         ),
-      //       ),
-      //       Padding(
-      //         padding: const EdgeInsets.only(left: 15, right: 15, bottom: 80),
-      //         child: TextFormField(
-      //           decoration: InputDecoration(hintText: "Password"),
-      //           obscureText: true,
-      //           onSaved: (input) {
-      //             _password = input;
-      //           },
-      //           validator: (input) {
-      //             if (input.length < 6) {
-      //               return "Password should be at least 6 characters long.";
-      //             }
-      //             return null;
-      //           },
-      //         ),
-      //       ),
-      //       FlatButton(
-      //         color: Colors.red,
-      //         onPressed: () {
-      //           setState(() {
-      //             //login();
-      //           });
-      //         },
-      //         child: Text(
-      //           "Login",
-      //           style:
-      //               TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-      //         ),
-      //       ),
-      //       Row(
-      //         mainAxisAlignment: MainAxisAlignment.center,
-      //         children: [
-      //           Text("Don't have an account?"),
-      //           SizedBox(
-      //             width: 10,
-      //           ),
-      //           GestureDetector(
-      //             onTap: () {
-      //               Navigator.push(
-      //                   context,
-      //                   MaterialPageRoute(
-      //                       //builder: (context) => RegistrationPage())
-      //               ));
-      //             },
-      //             child: Text(
-      //               "Sign up",
-      //               style: TextStyle(color: Colors.red),
-      //             ),
-      //           ),
-      //         ],
-      //       ),
-      //       Row(
-      //         mainAxisAlignment: MainAxisAlignment.center,
-      //         children: [
-      //           Text("Or, Sign in with"),
-      //           SizedBox(
-      //             height: 20,
-      //           )
-      //         ],
-      //       )
-      //     ],
-      //   ),
-      // ),
     );
+  }
+
+  loginUsingEmailAndPassword(String email, String password) async {
+    // print("Logging in with \nemail:" + email + "\nand Password: " + password);
+    var url = "http://localhost:3000/login";
+    final http.Response response = await http.post(
+      Uri.parse(url),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, String>{
+        'email': email,
+        'password': password,
+      }),
+    );
+
+    var parse = jsonDecode(response.body);
+    if (parse["error"] == 401) {
+      final snackBar =
+          SnackBar(content: Text("Incorrect Username or Password."));
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    } else if (parse["error"] == 403) {
+      final snackBar = SnackBar(content: Text("Incorrect Password."));
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    } else if (parse["token"] != null) {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setString('token', parse["token"]);
+      redirectUI();
+    }
   }
 }

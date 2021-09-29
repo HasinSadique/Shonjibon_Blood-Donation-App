@@ -1,6 +1,8 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shonjibon/homePage.dart';
 import 'package:splashscreen/splashscreen.dart';
 
 import 'LoginPage.dart';
@@ -19,7 +21,8 @@ class _SplashState extends State<Splash> {
         image: Image(
           image: AssetImage("asset/logo.png"),
         ),
-        navigateAfterSeconds: LoginPage(),
+        // navigateAfterSeconds: LoginPage(),
+        navigateAfterFuture: redirectUI(),
         seconds: 3,
         loadingText: Text(
           "Loading",
@@ -28,4 +31,13 @@ class _SplashState extends State<Splash> {
           ),
         ));
   }
+}
+
+Future<Widget> redirectUI() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  String token = prefs.getString("token");
+  if (token != null) {
+    return Future.value(new homePage());
+  }
+  return Future.value(new LoginPage());
 }

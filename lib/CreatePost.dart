@@ -62,7 +62,7 @@ class _CreatePostState extends State<CreatePost> {
                       ),
                       enabledBorder: OutlineInputBorder(
                           borderSide:
-                          BorderSide(color: Colors.red, width: 1.0))),
+                              BorderSide(color: Colors.red, width: 1.0))),
                 ),
               ),
               SizedBox(height: 10),
@@ -72,31 +72,32 @@ class _CreatePostState extends State<CreatePost> {
                   ElevatedButton(
                       style: ButtonStyle(
                           backgroundColor:
-                          MaterialStateProperty.all(Color(0xffee0b0b))),
+                              MaterialStateProperty.all(Color(0xffee0b0b))),
                       onPressed: null,
                       child: Text(
                         "Set Location",
                         style: TextStyle(
                             fontWeight: FontWeight.bold, color: Colors.white),
                       )),
-                  SizedBox(width: 10,),
+                  SizedBox(
+                    width: 10,
+                  ),
                   ElevatedButton(
                       style: ButtonStyle(
                           backgroundColor:
-                          MaterialStateProperty.all(Color(0xffee0b0b))),
+                              MaterialStateProperty.all(Color(0xffee0b0b))),
                       onPressed: null,
                       child: Text(
                         "POST",
                         style: TextStyle(
                             fontWeight: FontWeight.bold, color: Colors.white),
                       )),
-                  Center(
-                    child: AspectRatio(aspectRatio: 100 / 100,
-                      child:Container(
-                        decoration: BoxDecoration(color: Colors.black),
-                      ),),
-                  )
-
+                  // Center(
+                  //   child: AspectRatio(aspectRatio: 100 / 100,
+                  //     child:Container(
+                  //       decoration: BoxDecoration(color: Colors.black),
+                  //     ),),
+                  // )
                 ],
               ),
             ],

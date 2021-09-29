@@ -8,7 +8,14 @@ class User {
       _Gender,
       _Smoker,
       _Vaccinated,
-      _LastBloodDonationDate;
+      _LastBloodDonationDate,
+      _WantsToDonated;
+
+  get WantsToDonated => _WantsToDonated;
+
+  set WantsToDonated(value) {
+    _WantsToDonated = value;
+  }
 
   String get Fullname => _Fullname;
 

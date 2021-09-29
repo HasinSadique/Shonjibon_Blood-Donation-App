@@ -19,7 +19,8 @@ class _SignupPage2State extends State<SignupPage2> {
       _BloodGroup,
       _Age,
       _LastBloodDonationDate,
-      _isVaccinated;
+      _isVaccinated,
+      _WantsToDonated;
 
   final _formKey = GlobalKey<FormState>();
   TextEditingController _AgeController = TextEditingController();
@@ -34,6 +35,8 @@ class _SignupPage2State extends State<SignupPage2> {
   List VaccinationList = ['Yes', 'No', 'Partially'];
 
   DateTime _LastDonationDate;
+
+  bool _checked = false;
 
   @override
   Widget build(BuildContext context) {
@@ -69,7 +72,7 @@ class _SignupPage2State extends State<SignupPage2> {
             children: [
               SizedBox(
                   width: 180,
-                  height: 100,
+                  height: 80,
                   child: StepProgressIndicator(
                     totalSteps: 3,
                     currentStep: _StepCounter,
@@ -276,7 +279,7 @@ class _SignupPage2State extends State<SignupPage2> {
                                 ],
                               ),
                               SizedBox(
-                                height: 25,
+                                height: 20,
                               ),
                               Row(
                                 children: [
@@ -302,7 +305,35 @@ class _SignupPage2State extends State<SignupPage2> {
                                 ],
                               ),
                               SizedBox(
-                                height: 70,
+                                height: 20,
+                              ),
+                              Row(
+                                children: [
+                                  Column(
+                                    children: [
+                                      Checkbox(
+                                          value: _checked,
+                                          onChanged: (value) {
+                                            setState(() {
+                                              _checked = value;
+                                            });
+                                          }),
+                                    ],
+                                  ),
+                                  SizedBox(
+                                    width: 10,
+                                  ),
+                                  Expanded(
+                                      child: Column(
+                                    children: [
+                                      Text(
+                                          "Do you want to donate blood to save lives and join the cause?")
+                                    ],
+                                  ))
+                                ],
+                              ),
+                              SizedBox(
+                                height: 40,
                               ),
                             ],
                           ),
@@ -346,15 +377,15 @@ class _SignupPage2State extends State<SignupPage2> {
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () {
-                        _BloodGroup=BloodGroupChoose;
-                        _Age=_AgeController.text;
-                        _selectedGender=Gender;
-                        _isSmoker=_Smoker;
-                        _LastBloodDonationDate=SelectDate;
-                        if(_LastBloodDonationDate=="SelectDate"){
-                          _LastBloodDonationDate="Never Donated";
+                        _BloodGroup = BloodGroupChoose;
+                        _Age = _AgeController.text;
+                        _selectedGender = Gender;
+                        _isSmoker = _Smoker;
+                        _LastBloodDonationDate = SelectDate;
+                        if (_LastBloodDonationDate == "SelectDate") {
+                          _LastBloodDonationDate = "Never Donated";
                         }
-                        _isVaccinated=Vaccinated;
+                        _isVaccinated = Vaccinated;
                         if (_formKey.currentState.validate() &&
                             (_BloodGroup.isNotEmpty) &&
                             (_Age.isNotEmpty) &&
@@ -369,6 +400,11 @@ class _SignupPage2State extends State<SignupPage2> {
                           currentUser.Vaccinated = _isVaccinated;
                           currentUser.LastBloodDonationDate =
                               _LastBloodDonationDate;
+                          if (_checked == true) {
+                            currentUser.WantsToDonated = "Yes";
+                          } else {
+                            currentUser.WantsToDonated = "No";
+                          }
 
                           Navigator.push(
                               context,

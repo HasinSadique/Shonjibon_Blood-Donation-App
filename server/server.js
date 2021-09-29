@@ -1,7 +1,10 @@
+const e = require('express');
 const express = require('express')
 const app = express()
 const mongoose = require("mongoose");
 const port = 3000
+
+var jwt = require('jsonwebtoken');
 
 //mongodb
 async function connectDB() {
@@ -12,29 +15,67 @@ async function connectDB() {
 }
 connectDB();
 
+//model
+var schema = new mongoose.Schema({ email: 'string', password: 'string' });
+var User = mongoose.model('User', schema);
+
 //this takes the post body
 app.use(express.json({ extended: false }));
 
 app.get('/', (req, res) => {
   res.send('Hello World!')
 })
+
 //Signup Route
 app.post('/signup', async (req, res) => {
   const { email, password } = req.body;
   console.log(email);
   console.log(password);
-  var schema = new mongoose.Schema({ email: 'string', password: 'string' });
-  var User = mongoose.model('User', schema);
-  let user = new User({
-    email,
-    password,
+
+  User.findOne({ email }, async function (err,AnyUser) {
+    if(err){
+
+    }
+    if (AnyUser) {
+      res.json({ error: 403 });
+    } else {
+      let user = new User({
+        email,
+        password,
+      });
+      await user.save();
+
+      var token = jwt.sign({ id: user.id }, 'password');
+      res.json({ token: token });
+      console.log(user);
+    }
   });
-  console.log(user);
+});
 
-  await user.save();
+//Login Route
+app.post('/login', async (req, res) => {
+  pass = req.body.password;
+  email = req.body.email;
 
-  //check db for email existence
-  //  res.send('Signup Page')
+  User.findOne({ email }, async function (err, AnyUser) {
+    if (err) {
+      console.log(err);
+    }
+    if (AnyUser) {
+      if (AnyUser.password == pass) {
+        console.log("Yes user found.");
+        console.log(AnyUser);
+        var token = jwt.sign({ id: AnyUser.id }, 'password');
+        res.json({ token: token });
+      } else {
+        console.log("Incorrect password.");
+        res.json({ error: 403 });
+      }
+    } else {
+      console.log("No user found with this email.");
+      res.json({ error: 401 });
+    }
+  });
 });
 
 app.listen(port, () => {
