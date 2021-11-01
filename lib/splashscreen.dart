@@ -37,7 +37,7 @@ Future<Widget> redirectUI() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   String token = prefs.getString("token");
   if (token != null) {
-    return Future.value(new homePage());
+    return Future.value(new homePage(token: token));
   }
   return Future.value(new LoginPage());
 }

@@ -1,5 +1,8 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:shonjibon/homePage.dart';
 
 class CreatePost extends StatefulWidget {
   const CreatePost({Key key}) : super(key: key);
@@ -9,8 +12,18 @@ class CreatePost extends StatefulWidget {
 }
 
 class _CreatePostState extends State<CreatePost> {
+  TextEditingController BloodRequestPostController = TextEditingController();
+
+  String BloodGroupChoose;
+  List BloodGroupList = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
+
+  var userID = 0;
+  String currentUserName = "Current User Name";
+  var post, location, bloodType;
+
   @override
   Widget build(BuildContext context) {
+    getCurrentUserDetails();
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Color(0xffee0b0b),
@@ -42,7 +55,7 @@ class _CreatePostState extends State<CreatePost> {
                 ),
               ),
               Text(
-                "Hasin Sadique",
+                currentUserName,
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
               )
             ],
@@ -52,6 +65,7 @@ class _CreatePostState extends State<CreatePost> {
               Padding(
                 padding: const EdgeInsets.only(left: 15, right: 15),
                 child: TextField(
+                  controller: BloodRequestPostController,
                   keyboardType: TextInputType.multiline,
                   minLines: 1,
                   maxLines: 20,
@@ -69,6 +83,27 @@ class _CreatePostState extends State<CreatePost> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  DropdownButton(
+                    iconEnabledColor: Colors.red,
+                    style: TextStyle(color: Colors.red),
+                    focusColor: Color(0xffee0b0b),
+                    hint: Text("Set Blood Type"),
+                    value: BloodGroupChoose,
+                    onChanged: (newValue) {
+                      setState(() {
+                        BloodGroupChoose = newValue;
+                      });
+                    },
+                    items: BloodGroupList.map((valueItem) {
+                      return DropdownMenuItem(
+                        value: valueItem,
+                        child: Text(valueItem),
+                      );
+                    }).toList(),
+                  ),
+                  SizedBox(
+                    width: 10,
+                  ),
                   ElevatedButton(
                       style: ButtonStyle(
                           backgroundColor:
@@ -79,31 +114,58 @@ class _CreatePostState extends State<CreatePost> {
                         style: TextStyle(
                             fontWeight: FontWeight.bold, color: Colors.white),
                       )),
-                  SizedBox(
-                    width: 10,
-                  ),
-                  ElevatedButton(
-                      style: ButtonStyle(
-                          backgroundColor:
-                              MaterialStateProperty.all(Color(0xffee0b0b))),
-                      onPressed: null,
-                      child: Text(
-                        "POST",
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, color: Colors.white),
-                      )),
-                  // Center(
-                  //   child: AspectRatio(aspectRatio: 100 / 100,
-                  //     child:Container(
-                  //       decoration: BoxDecoration(color: Colors.black),
-                  //     ),),
-                  // )
                 ],
               ),
+              SizedBox(
+                height: 30,
+              ),
+              ElevatedButton(
+                  style: ButtonStyle(
+                      backgroundColor:
+                          MaterialStateProperty.all(Color(0xffee0b0b))),
+                  onPressed: () {
+                    postBloodRequest();
+                    setState(() {
+                      Navigator.pop(context);
+                    });
+                  },
+                  child: Text(
+                    "POST",
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold, color: Colors.white),
+                  )),
             ],
           )
         ],
       ),
     );
+  }
+
+  postBloodRequest() async {
+    var url = "http://localhost:3300/post_blood_request";
+    bloodType = BloodGroupChoose;
+    post = BloodRequestPostController.text;
+    final response = await http.post(
+      Uri.parse(url),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, String>{
+        'userID': userID.toString(),
+        'post': post,
+        'location': location,
+        'bloodType': bloodType,
+      }),
+    );
+  }
+
+  Future<void> getCurrentUserDetails() async {
+    userID = homePage.userID;
+    currentUserName = homePage.fullName;
+
+    // SharedPreferences prefs = await SharedPreferences.getInstance();
+    // userID = prefs.getInt("CurrentUserID");
+    // currentUserName = prefs.getString("CurrentUserName");
+    // return currentUserName;
   }
 }

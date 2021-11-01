@@ -519,15 +519,24 @@ class _SignupPage3State extends State<SignupPage3> {
   }
 
   uploadSignupData(User currentUser) async {
-    var url = "http://localhost:3000/signup";
+    var url = "http://localhost:3300/signup";
     final response = await http.post(
       Uri.parse(url),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
       body: jsonEncode(<String, String>{
+        'Name': currentUser.Fullname,
         'email': currentUser.Email,
         'password': currentUser.Password,
+        'Mobile': currentUser.Mobile,
+        'Blood_Group': currentUser.BloodGroup,
+        'Age': currentUser.Age,
+        'Gender': currentUser.Gender,
+        'Smoker': currentUser.Smoker,
+        'Last_Blood_Donated': currentUser.LastBloodDonationDate,
+        'Vaccinated': currentUser.Vaccinated,
+        'Is_Donor': currentUser.WantsToDonated,
       }),
     );
 

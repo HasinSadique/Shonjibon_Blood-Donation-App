@@ -1,13 +1,24 @@
-import 'package:circular_profile_avatar/circular_profile_avatar.dart';
+import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:http/http.dart' as http;
+import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shonjibon/Album.dart';
 import 'package:shonjibon/CreatePost.dart';
 import 'package:shonjibon/LoginPage.dart';
+import 'package:shonjibon/User.dart';
+
+import 'MyProfile.dart';
+import 'Users.dart';
 
 class homePage extends StatefulWidget {
-  const homePage({Key key}) : super(key: key);
+  static String fullName, userEmail, signedInUserToken;
+  static int userID;
+
+  String token;
+
+  homePage({Key key, this.token}) : super(key: key);
 
   @override
   _homePageState createState() => _homePageState();
@@ -16,6 +27,9 @@ class homePage extends StatefulWidget {
 class _homePageState extends State<homePage> {
   @override
   Widget build(BuildContext context) {
+    // var bb = loadNewsFeed();
+    getUserDetails(widget.token);
+
     return Scaffold(
       drawer: Drawer(
         child: ListView(
@@ -29,20 +43,28 @@ class _homePageState extends State<homePage> {
                 ),
                 child: Column(
                   children: [
-                    Container(
-                      height: 80,
-                      width: 80,
-                      decoration: BoxDecoration(
-                          image: DecorationImage(
-                              image: AssetImage("asset/profilepic.jpg")),
-                          shape: BoxShape.circle,
-                          color: Colors.black),
+                    InkWell(
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => MyProfile()));
+                      },
+                      child: Container(
+                        height: 80,
+                        width: 80,
+                        decoration: BoxDecoration(
+                            image: DecorationImage(
+                                image: AssetImage("asset/profilepic.jpg")),
+                            shape: BoxShape.circle,
+                            color: Colors.black),
+                      ),
                     ),
                     SizedBox(
                       height: 10,
                     ),
                     Text(
-                      "Hasin Sadique",
+                      homePage.fullName,
                       style: TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
@@ -198,7 +220,33 @@ class _homePageState extends State<homePage> {
                         child: Text(
                           "Post Blood Request",
                           style: TextStyle(fontWeight: FontWeight.bold),
-                        ))
+                        )),
+                    Container(
+                      child: Card(
+                        child: FutureBuilder(
+                          future: getUserData(),
+                          builder: (context, snapshot) {
+                            if (snapshot.data == null) {
+                              return Container(
+                                height: 100,
+                                width: 200,
+                                child: Center(
+                                  child: Text("Loading..."),
+                                ),
+                              );
+                            } else
+                              return ListView.builder(
+                                itemCount: 10,
+                                itemBuilder: (context, index) {
+                                  return ListTile(
+                                    title: Text(snapshot.data),
+                                  );
+                                },
+                              );
+                          },
+                        ),
+                      ),
+                    )
                   ],
                 ),
                 Column(
@@ -222,4 +270,72 @@ class _homePageState extends State<homePage> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.remove("token");
   }
+
+  getUserDetails(String token) async {
+    //First check if localstorage is not empty
+    //retrieve details from LStore
+    //else decode JWT
+    print("Decoding Token");
+    Map<String, dynamic> decodedTOKEN = JwtDecoder.decode(token);
+    // User signedInUser = new User();
+    // _fullName = decodedTOKEN["fullname"];
+    homePage.fullName = decodedTOKEN["fullname"];
+    homePage.userEmail = decodedTOKEN["email"];
+    homePage.userID = decodedTOKEN["id"];
+    //set Current User Info in shared Preference
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('CurrentUserID', decodedTOKEN["id"]);
+    await prefs.setString('CurrentUserName', decodedTOKEN["fullname"]);
+    await prefs.setString('CurrentUserEmail', decodedTOKEN["email"]);
+    //and store details in LStore
+
+    // and then display.
+    // print("Setting Full Name");
+    // _fullName = signedInUser.Fullname;
+
+    //Save in local storage
+  }
+
+  Future<List<Album>> getUserData() async {
+    var response =
+        await http.get(Uri.https('jsonplaceholder.typicode.com', 'users'));
+
+    var jsonData = jsonDecode(response.body);
+    List<Album> albums = [];
+
+    for (var u in jsonData) {
+      Album album = Album(u[''], u[''], u['']);
+      albums.add(album);
+    }
+    print(albums.length);
+    return albums;
+  }
+
+  // Future<http.Response> loadNewsFeed() async {
+  //   var response = await http.get(Uri.parse('http://localhost:3300/users'));
+  //   var jsonData = jsonDecode(response.body);
+  //   List<Users> users = [];
+
+  //   for (var item in jsonData) {
+  //     Users user = Users(
+  //         item['UserID'],
+  //         item['Name'],
+  //         item['Email'],
+  //         item['Mobile'],
+  //         item['Password'],
+  //         item['Blood_Group'],
+  //         item['Age'],
+  //         item['Gender'],
+  //         item['Smoker'],
+  //         item['Vaccinated'],
+  //         item['Is_Donor'],
+  //         item['Last_Blood_Donated']);
+
+  //     users.add(user);
+  //   }
+  //   // print("Total users: ");
+  //   // print(users[0].userId);
+
+  //   return users;
+  // }
 }

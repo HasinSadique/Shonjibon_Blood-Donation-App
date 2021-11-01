@@ -37,6 +37,7 @@ dependencies:
   flutter_cupertino_date_picker: ^1.0.26+2
   http: ^0.13.3
   shared_preferences: ^2.0.7
+  jwt_decoder: ^2.0.1
 
 dev_dependencies:
   flutter_test:

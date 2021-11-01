@@ -3,6 +3,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shonjibon/SignUp.dart';
 import 'package:http/http.dart' as http;
@@ -28,7 +29,11 @@ class _LoginPageState extends State<LoginPage> {
     String token = prefs.getString("token");
     if (token != null) {
       Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (context) => homePage()));
+          context,
+          MaterialPageRoute(
+              builder: (context) => homePage(
+                    token: token,
+                  )));
     }
   }
 
@@ -255,7 +260,7 @@ class _LoginPageState extends State<LoginPage> {
 
   loginUsingEmailAndPassword(String email, String password) async {
     // print("Logging in with \nemail:" + email + "\nand Password: " + password);
-    var url = "http://localhost:3000/login";
+    var url = "http://localhost:3300/login";
     final http.Response response = await http.post(
       Uri.parse(url),
       headers: <String, String>{
