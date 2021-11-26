@@ -44,16 +44,17 @@ class _SignUpState extends State<SignUp> {
       ),
       body: Center(
         child: Container(
+            height: MediaQuery.of(context).size.height,
             color: Colors.white,
             child: Column(
               children: [
                 SizedBox(
                     width: 180,
-                    height: 100,
+                    height: 70,
                     child: StepProgressIndicator(
                       totalSteps: 3,
                       currentStep: _StepCounter,
-                      size: 8,
+                      size: 6,
                       roundedEdges: Radius.circular(25),
                       selectedColor: Color(0xffd60000),
                     )),
@@ -156,7 +157,7 @@ class _SignUpState extends State<SignUp> {
                                   },
                                 ),
                                 SizedBox(
-                                  height: 60,
+                                  height: 40,
                                 ),
                               ],
                             ),
@@ -167,7 +168,7 @@ class _SignUpState extends State<SignUp> {
                   ),
                 ),
                 SizedBox(
-                  height: 30,
+                  height: 25,
                 ),
                 SizedBox(
                   width: 300,
