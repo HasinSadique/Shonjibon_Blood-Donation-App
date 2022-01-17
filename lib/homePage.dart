@@ -11,6 +11,7 @@ import 'package:shonjibon/User.dart';
 
 import 'MyProfile.dart';
 import 'Users.dart';
+import 'VideoCall.dart';
 
 class homePage extends StatefulWidget {
   static String fullName, userEmail, signedInUserToken;
@@ -117,6 +118,21 @@ class _homePageState extends State<homePage> {
               // ),
               title: Text(
                 "My Posts",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
+            ListTile(
+              onTap: () {
+                LogOutUser();
+                Navigator.pushReplacement(context,
+                    MaterialPageRoute(builder: (context) => VideoCall()));
+              },
+              leading: Icon(
+                Icons.settings,
+                color: Colors.black,
+              ),
+              title: Text(
+                "Video Call",
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
             ),

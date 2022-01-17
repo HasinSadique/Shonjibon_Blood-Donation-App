@@ -31,13 +31,15 @@ class _SignUpState extends State<SignUp> {
           color: Colors.black,
         ),
         elevation: 0,
-        title: Text(
-          "SHONJIBON",
-          style: TextStyle(
-              fontFamily: 'Arial_Rounded_MT_Bold',
-              fontSize: 30,
-              fontWeight: FontWeight.bold,
-              color: Color(0xffd60000)),
+        title: Center(
+          child: Text(
+            "SHONJIBON",
+            style: TextStyle(
+                fontFamily: 'Arial_Rounded_MT_Bold',
+                fontSize: 30,
+                fontWeight: FontWeight.bold,
+                color: Color(0xffd60000)),
+          ),
         ),
         backgroundColor: Colors.white,
         shadowColor: Colors.white,
